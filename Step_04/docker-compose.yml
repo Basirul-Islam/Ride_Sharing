@@ -1,0 +1,88 @@
+version: '3'
+
+networks:
+    bdnet:
+      ipam:
+        config:
+          - subnet: 10.100.0.0/24
+          
+services: 
+    rating-service:
+        build: ./rating-service/
+        restart: always
+        depends_on: 
+            - mongodb
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.4  
+
+    communication-service-dhaka:
+        build: ./communication-service/
+        restart: always
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.22
+    
+    ride-sharing-service-dhaka:
+        build: ./ride-sharing-service/
+        restart: always
+        depends_on: 
+            - communication-service-dhaka
+        environment: 
+            - LOCATION=dhaka
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.21
+
+    nginx-dhaka:
+        build: ./nginx/
+        depends_on: 
+            - rating-service
+            - ride-sharing-service-dhaka
+        environment: 
+            - RSS=ride-sharing-service-dhaka
+            - RS=rating-service
+        command: /bin/sh -c "envsubst < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'" 
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.20
+                
+    communication-service-ctg:
+        build: ./communication-service/
+        restart: always
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.32
+    
+    ride-sharing-service-ctg:
+        build: ./ride-sharing-service/
+        restart: always
+        depends_on: 
+            - communication-service-ctg
+        environment: 
+            - LOCATION=ctg
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.31
+
+    nginx-ctg:
+        build: ./nginx/
+        depends_on: 
+            - rating-service
+            - ride-sharing-service-ctg
+        environment: 
+            - RSS=ride-sharing-service-ctg
+            - RS=rating-service
+        command: /bin/sh -c "envsubst < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'" 
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.30
+
+    mongodb:
+        image: mongo
+        ports: 
+            - 27019:27017
+        networks:
+            bdnet:
+                ipv4_address: 10.100.0.5
+    

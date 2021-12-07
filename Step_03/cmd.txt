@@ -1,0 +1,40 @@
+----Docker----
+
+#Build docker image
+docker build -t <image-name> .
+
+#Forcefully delete docker image
+docker rmi -f <image-id | image-name>
+
+#Show all image
+docker image ls
+
+#Show all running container
+docker ps
+
+#Stop running container
+docker container stop <container-id | container-name>
+
+#Run docker image in terminal
+docker run -it -p <host-port>:<guest-port> <image-id | image-name>
+
+#Kill all running container
+docker kill $(docker ps -q)
+
+
+----Docker Compose----
+
+#Build docker-compose.yml
+sudo docker-compose build
+
+#Run docker compose
+sudo docker-compose up
+
+----Nginx----
+
+#Stop Nginx service
+sudo service nginx stop
+
+----Node----
+#Start Node.js app
+npm start

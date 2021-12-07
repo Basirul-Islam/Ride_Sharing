@@ -1,0 +1,11 @@
+server {
+	listen 80;
+	
+	location /ride-sharing-service/api {
+		proxy_pass http://${RSS}:8080;
+	}
+	
+	location /rating-service/api {
+		proxy_pass http://${RS}:8080;
+	}
+}
